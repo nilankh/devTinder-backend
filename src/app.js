@@ -4,6 +4,7 @@ const express = require("express");
 
 const app = express();
 
+// order of the router matters
 
 // if line 9 "/" we are uncommeting and callingthen why /nilank or /test is not working, reason is we have associated / with the  the given data
 // app.use("/",(req, res) => {
