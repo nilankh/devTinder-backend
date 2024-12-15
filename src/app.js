@@ -3,48 +3,107 @@ const express = require("express");
 // create new express application, instance of express
 const app = express();
 
-
-// this means b is optional
-// app.get("/ab?c", (req, res) => {
-//     res.send({"firstName":"Nilank", "lastName":"NIKHIL"})
+// what will happen when nothing will be return will be return from api, it will be timeout
+// app.use("/user", (req, res) => {
+    // Route Handler
+//     // res.send("route Handler 1")
 // })
 
-// it means you can add as many b as you can /abbbbbbc, /abc,abbbc all will work.
-// app.get("/ab?c", (req, res) => {
-//     res.send({"firstName":"Nilank", "lastName":"NIKHIL"})
+// // one route can have multiple route handler
+// // next is given by express.js
+// app.use("/user", (req, res, next) => {
+//     // res.send("route Handler 1")
+//     next();
+// }, (req, res) => {
+//     // route handler 2
+//     res.send("route handler 2")
 // })
+// otuput is route handler 2
 
-// This means, if you write ab and then anything in between ad towards the end you write cd it will give you the result.
-// app.get("/ab*cd", (req, res) => {
-//     res.send({"firstName":"Nilank", "lastName":"NIKHIL"})
+
+// // one route can have multiple route handler
+// // next is given by express.js
+// app.use("/user", (req, res, next) => {
+//     res.send("route Handler 1")
+//     next();
+// }, (req, res) => {
+//     // route handler 2
+//     res.send("route handler 2")
 // })
+// output is router haandler1 WE SHOULD NEVER WRITE LIKE THIS
 
-// This means bc is optional, /abcd,/ad
-// app.get("/a(bc)?d", (req, res) => {
-//     res.send({"firstName":"Nilank", "lastName":"NIKHIL"})
+
+// one route can have multiple route handler
+// next is given by express.js
+// app.use("/user", (req, res, next) => {
+//     next();
+//     res.send("route Handler 1")
+    
+// }, (req, res) => {
+//     // route handler 2
+//     res.send("route handler 2")
 // })
+// // OUTPUT IS ROUTE HANDLER 2
 
-// this means anything in url if a is there it will work
-// app.get(/a/, (req, res) => {
-//     res.send({"firstName":"Nilank", "lastName":"NIKHIL"})
-// })
 
-// anything ending with fly will work
-// app.get(/.*fly$/, (req, res) => {
-//     res.send({"firstName":"Nilank", "lastName":"NIKHIL"})
-// })
+// app.use("/user", (req, res, next) => {
+//     console.log("Handling the route user 1")
+//     // res.send("route Handler 1")
+//     next();
+    
+// }, (req, res, next) => {
+//     // route handler 2
+//     // res.send("route handler 2")
+//     console.log("Handling the route user 2")
+//     next();
+// },  (req, res, next) => {
+//     // route handler 2
+//     // res.send("route handler 3")
+//     console.log("Handling the route user 3")
+//     next();
+// }, (req, res, next) => {
+//     // route handler 2
+//     // res.send("route handler 4")
+//     console.log("Handling the route user 4")
+//     next();
+// });
+// // OUTPUT IS nothing
 
-// query_params
-// app.get("/user/", (req, res) => {
-//     console.log('req', req.query)
-//     res.send({"firstName":"Nilank", "lastName":"NIKHIL"})
-// })
 
-// path params
-app.get("/user/:userId", (req, res) => {
-    console.log('req', req.params)
-    res.send({"firstName":"Nilank", "lastName":"NIKHIL"})
-})
+
+// you can wrap also inside the array
+app.use("/user", 
+[(req, res, next) => {
+    console.log("Handling the route user 1")
+    // res.send("route Handler 1")
+    next();
+    
+}, 
+(req, res, next) => {
+    // route handler 2
+    // res.send("route handler 2")
+    console.log("Handling the route user 2")
+    next();
+},  
+(req, res, next) => {
+    // route handler 2
+    // res.send("route handler 3")
+    console.log("Handling the route user 3")
+    next();
+}, 
+(req, res, next) => {
+    // route handler 2
+    // res.send("route handler 4")
+    console.log("Handling the route user 4")
+    next();
+},(req, res, next) => {
+    // route handler 2
+    console.log("Handling the route user 5")
+    res.send("route handler 5")
+    
+    
+}]);
+// OUTPUT IS ROUTE HANDLER 2
 
 
 
