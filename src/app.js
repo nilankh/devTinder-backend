@@ -72,40 +72,51 @@ const app = express();
 
 
 // you can wrap also inside the array
-app.use("/user", 
-[(req, res, next) => {
-    console.log("Handling the route user 1")
-    // res.send("route Handler 1")
-    next();
+// app.use("/user", 
+// [(req, res, next) => {
+//     console.log("Handling the route user 1")
+//     // res.send("route Handler 1")
+//     next();
     
-}, 
-(req, res, next) => {
-    // route handler 2
-    // res.send("route handler 2")
-    console.log("Handling the route user 2")
-    next();
-},  
-(req, res, next) => {
-    // route handler 2
-    // res.send("route handler 3")
-    console.log("Handling the route user 3")
-    next();
-}, 
-(req, res, next) => {
-    // route handler 2
-    // res.send("route handler 4")
-    console.log("Handling the route user 4")
-    next();
-},(req, res, next) => {
-    // route handler 2
-    console.log("Handling the route user 5")
-    res.send("route handler 5")
+// }, 
+// (req, res, next) => {
+//     // route handler 2
+//     // res.send("route handler 2")
+//     console.log("Handling the route user 2")
+//     next();
+// },  
+// (req, res, next) => {
+//     // route handler 2
+//     // res.send("route handler 3")
+//     console.log("Handling the route user 3")
+//     next();
+// }, 
+// (req, res, next) => {
+//     // route handler 2
+//     // res.send("route handler 4")
+//     console.log("Handling the route user 4")
+//     next();
+// },(req, res, next) => {
+//     // route handler 2
+//     console.log("Handling the route user 5")
+//     res.send("route handler 5")
     
     
-}]);
+// }]);
 // OUTPUT IS ROUTE HANDLER 2
 
 
+// GET /USERS => MIDDLEWARE CHAIN => REQUEST HANDLER
+// these all are middlewares, for like app.use('/user') to call this it first see kauns kausa matching and last me jaake ye return response kr rha h saare function ko cross krke toa wo ek trh se middleware hi h
+// middleware hi h
+app.use("/user", (req, res, next)=> {
+    next();
+})
+app.get("/user", (req, res) => {
+    // console.log("Handling the user1");
+    // next();
+    res.send("hello")
+})
 
 
 app.listen(3000, ()=> {
