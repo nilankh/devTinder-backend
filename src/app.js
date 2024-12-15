@@ -3,119 +3,54 @@ const express = require("express");
 // create new express application, instance of express
 const app = express();
 
-// what will happen when nothing will be return will be return from api, it will be timeout
-// app.use("/user", (req, res) => {
-    // Route Handler
-//     // res.send("route Handler 1")
-// })
-
-// // one route can have multiple route handler
-// // next is given by express.js
-// app.use("/user", (req, res, next) => {
-//     // res.send("route Handler 1")
-//     next();
-// }, (req, res) => {
-//     // route handler 2
-//     res.send("route handler 2")
-// })
-// otuput is route handler 2
-
-
-// // one route can have multiple route handler
-// // next is given by express.js
-// app.use("/user", (req, res, next) => {
-//     res.send("route Handler 1")
-//     next();
-// }, (req, res) => {
-//     // route handler 2
-//     res.send("route handler 2")
-// })
-// output is router haandler1 WE SHOULD NEVER WRITE LIKE THIS
-
-
-// one route can have multiple route handler
-// next is given by express.js
-// app.use("/user", (req, res, next) => {
-//     next();
-//     res.send("route Handler 1")
-    
-// }, (req, res) => {
-//     // route handler 2
-//     res.send("route handler 2")
-// })
-// // OUTPUT IS ROUTE HANDLER 2
-
-
-// app.use("/user", (req, res, next) => {
-//     console.log("Handling the route user 1")
-//     // res.send("route Handler 1")
-//     next();
-    
-// }, (req, res, next) => {
-//     // route handler 2
-//     // res.send("route handler 2")
-//     console.log("Handling the route user 2")
-//     next();
-// },  (req, res, next) => {
-//     // route handler 2
-//     // res.send("route handler 3")
-//     console.log("Handling the route user 3")
-//     next();
-// }, (req, res, next) => {
-//     // route handler 2
-//     // res.send("route handler 4")
-//     console.log("Handling the route user 4")
-//     next();
-// });
-// // OUTPUT IS nothing
-
-
-
-// you can wrap also inside the array
-// app.use("/user", 
-// [(req, res, next) => {
-//     console.log("Handling the route user 1")
-//     // res.send("route Handler 1")
-//     next();
-    
-// }, 
-// (req, res, next) => {
-//     // route handler 2
-//     // res.send("route handler 2")
-//     console.log("Handling the route user 2")
-//     next();
-// },  
-// (req, res, next) => {
-//     // route handler 2
-//     // res.send("route handler 3")
-//     console.log("Handling the route user 3")
-//     next();
-// }, 
-// (req, res, next) => {
-//     // route handler 2
-//     // res.send("route handler 4")
-//     console.log("Handling the route user 4")
-//     next();
-// },(req, res, next) => {
-//     // route handler 2
-//     console.log("Handling the route user 5")
-//     res.send("route handler 5")
-    
-    
-// }]);
-// OUTPUT IS ROUTE HANDLER 2
-
-
-// GET /USERS => MIDDLEWARE CHAIN => REQUEST HANDLER
-// these all are middlewares, for like app.use('/user') to call this it first see kauns kausa matching and last me jaake ye return response kr rha h saare function ko cross krke toa wo ek trh se middleware hi h
-// middleware hi h
-app.use("/user", (req, res, next)=> {
-    next();
+// if you want to "use", then all the api's starting with use will be go through this middleware, if you only want get, then you can use like app.get("/admin")
+// Handle Auth middleware for all request
+app.use("/admin", (req, res, next) => {
+    console.log("admiin auth is getting checked!")
+    const token  = "xyz"
+    const isAdminAuthorized = token === "xyz"
+    if (!isAdminAuthorized){
+        res.status(401).send("Unauthorized request!")
+    }else {
+        next();
+    }
 })
-app.get("/user", (req, res) => {
-    // console.log("Handling the user1");
-    // next();
-    res.send("hello")
+
+
+// why do we need middlware
+// app.get('/admin/getAllData', (req,res) => {
+//     // check if the request is actually made by admin or is it authorized or not
+
+
+//     // don't you think you  need to write this again and again
+//     const token  = "xyz"
+//     const isAdminAuthorized = token === "xyz"
+//     if (isAdminAuthorized){
+//         // logic of fetching all the data
+//         res.send("All Data sent")
+//     }else {
+//         res.status(401).send("Unauthorized!")
+//     }
+//     // now think you need to put this authorization to all the admin api's, do you want to write again and again?
+//     // No right, this is where middleware comes into the picture
+// })
+
+// app.get('/admin/deleteUser', (req,res) => {
+
+
+//     // logic of deleting the user
+//     res.send("User is deleted")
+// })
+
+
+
+//after makoign middleware we can directly send the response back
+app.get("/admin/getAllData", (req, res) => {
+    res.send("All Data sent!")
+})
+
+app.get('/admin/deleteUser', (req,res) => {
+    res.send("User is deleted")
 })
 
 
