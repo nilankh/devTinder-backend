@@ -8,20 +8,21 @@ console.log("fszd",User)
 
 app.post('/signup', async(req, res) => {
     const userObj = {
-        firstName: "Nilank",
-        lastName: "Nikhil",
-        emailId: "nilanknikhil@gmail.com",
+        firstName: "Harshita",
+        lastName: "Annadanapu",
+        emailId: "harshita@gmail.com",
         password: "Nilank@123"
     }
-
-    // creating new Instance of User model
-    const user = new User(userObj);
-    // it returns a promises so we need to await
-    await user.save();
-
-    res.send("User successfully created!")
-
-})
+    try{
+        // creating new Instance of User model
+        const user = new User(userObj);
+        // it returns a promises so we need to await
+        await user.save();
+        res.send("User successfully created!");
+    } catch(err) {
+        res.status(400).send("Error saving the user: ",err.message);
+    }
+});
 
 
 connectDB().then(() => {
