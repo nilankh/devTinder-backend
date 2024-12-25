@@ -36,11 +36,17 @@ app.post('/signup', async(req, res) => {
 app.get('/users/:email', async(req, res) => {
     
     try{
-        const user = await User.find({emailId: req.params.email});
-        if(user.length === 0) {
+        // const user = await User.find({emailId: req.params.email});
+        // if(user.length === 0) {
+        //     res.status(404).send("User not found");
+        // } else {
+        //     res.send(user);
+        // }
+        const user = await User.findOne({emailId: req.params.email});
+        if(!user) {
             res.status(404).send("User not found");
-        } else {
-            res.send(user);
+        }else {
+            res.send(user)
         }
     }catch(err) {
         res.status(400).send("Something went wrong");
@@ -57,6 +63,21 @@ app.get('/users', async(req, res) => {
     }
 });
 
+app.delete('/users/:id', async(req, res) => {
+    try{
+        // const userId = await User.findByIdAndDelete(req.params.id);
+        const userId = await User.findByIdAndDelete({"_id":req.params.id});
+        
+        if(!userId) {
+            res.status(404).send("User not found");
+        } else {
+            res.send("User deleted successfully");
+        }
+    }catch(err) {
+        console.log(err.message);
+        res.status(400).send("Something went wrong");
+    }
+});
 
 connectDB().then(() => {
     console.log("Database connection eastablished....")
