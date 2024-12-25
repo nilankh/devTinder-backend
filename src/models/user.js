@@ -25,4 +25,4 @@ const userSchema = new mongoose.Schema({
 // creating a model
 const User = mongoose.model("User", userSchema);
 
-module.exports = useFormStatus;
+module.exports = User;
