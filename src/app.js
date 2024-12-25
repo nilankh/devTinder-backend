@@ -11,22 +11,50 @@ app.use(express.json());
 app.post('/signup', async(req, res) => {
 
     // it will be undefined, reason is our server is not able to read the json data, to read the json data we need a middleware which can check the incoming request and parse the json data
-    console.log("req", req.body)
+    // console.log("req", req.body)
     // const userObj = {
     //     firstName: "Neel",
     //     lastName: "Punj",
     //     emailId: "punjneel@gmail.com",
     //     password: "Nilank@123"
     // }
-    // try{
-    //     // creating new Instance of User model
-    //     const user = new User(userObj);
-    //     // it returns a promises so we need to await
-    //     await user.save();
-    //     res.send("User successfully created!");
-    // } catch(err) {
-    //     res.status(400).send("Error saving the user: ",err.message);
-    // }
+
+    const user = new User(req.body);
+   
+    try{
+        // creating new Instance of User model
+        // const user = new User(userObj);
+        // it returns a promises so we need to await
+        await user.save();
+        res.send("User successfully created!");
+    } catch(err) {
+        res.status(400).send("Error saving the user: ",err.message);
+    }
+});
+
+// get user by email
+app.get('/users/:email', async(req, res) => {
+    
+    try{
+        const user = await User.find({emailId: req.params.email});
+        if(user.length === 0) {
+            res.status(404).send("User not found");
+        } else {
+            res.send(user);
+        }
+    }catch(err) {
+        res.status(400).send("Something went wrong");
+    }
+});
+
+// get all the users
+app.get('/users', async(req, res) => {
+    try{
+        const users = await User.find();
+        res.send(users);
+    }catch(err) {
+        res.status(400).send("Something went wrong");
+    }
 });
 
 
