@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { useFormStatus } = require('react-dom');
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
         maxLength: 100,
     },
     lastName: {
-        type: String
+        type: String,
+        minLength: 4,
     },
     emailId: {
         type: String,
@@ -17,10 +18,20 @@ const userSchema = new mongoose.Schema({
         unique:true,
         lowercase:true,
         trim:true,
+        validate(value) {
+            if(!validator.isEmail(value)) {
+                throw new Error("Email is not valid");
+            }
+        }
     },
     password: {
         type: String,
         required:true,
+        validate(value) {
+            if(!validator.isStrongPassword(value)) {
+                throw new Error("Password is not strong");
+            }   
+        }
     },
     age: {
         type: Number,
@@ -36,16 +47,22 @@ const userSchema = new mongoose.Schema({
     },
     photoUrl: {
         type: String,
-        default:"https://www.opi.net/wp-content/uploads/2018/06/dummy-member.jpg"
+        default:"https://www.opi.net/wp-content/uploads/2018/06/dummy-member.jpg",
+        validate(value) {
+            if(!validator.isURL(value)) {
+                throw new Error("URL is not valid");
+            }
+        }
     },
     about: {
         type: String,
-        default:"Hey there! I am using DevTinder"
+        maxLength: 200,
+        default:"Hey there! I am using DevTinder",
     },
     skills: {
         type: [String],
     },
-})
+}, {timestamps: true});
 
 // creating a model
 const User = mongoose.model("User", userSchema);

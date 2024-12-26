@@ -1,4 +1,5 @@
 const express = require("express");
+const validator = require("validator");
 const connectDB = require("./config/database")
 // require("./config/database")
 // create new express application, instance of express
@@ -17,10 +18,15 @@ app.post('/signup', async(req, res) => {
     //     emailId: "punjneel@gmail.com",
     //     password: "Nilank@123"
     // }
-
-    const user = new User(req.body);
    
     try{
+        if(!validator.isEmail(req.body.emailId)) {
+            throw new Error("Email is not valid");
+        }
+        if (req.body.skills?.length > 10){
+            throw new Error("Skills can not be more than 10");
+        }
+        const user = new User(req.body);
         // creating new Instance of User model
         // const user = new User(userObj);
         // it returns a promises so we need to await
@@ -79,9 +85,22 @@ app.delete('/users/:id', async(req, res) => {
 });
 
 app.patch('/users/:id', async(req, res) => {
+    
     try{
+        const ALLOWED_UPDATES = ["firstName", "lastName",  "password","photoUrl", "about", "skills"];
+
+        const isUpdateAllowed = Object.keys(req.body).every(update => ALLOWED_UPDATES.includes(update));
+
+        if(!isUpdateAllowed) {
+            throw new Error("Update not allowed");
+        }
+
+        if (req.body.skills?.length > 10){
+            throw new Error("Skills can not be more than 10");
+        }
         const userId = await User.findByIdAndUpdate({_id: req.params.id}, req.body, {returnDocument:"before",runValidators:true});
         console.log("userId", userId);
+
         if(!userId) {
             res.status(404).send("User not found");
         } else {
