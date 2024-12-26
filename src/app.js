@@ -9,7 +9,6 @@ const User = require("./models/user")
 app.use(express.json());
 
 app.post('/signup', async(req, res) => {
-
     // it will be undefined, reason is our server is not able to read the json data, to read the json data we need a middleware which can check the incoming request and parse the json data
     // console.log("req", req.body)
     // const userObj = {
@@ -26,9 +25,9 @@ app.post('/signup', async(req, res) => {
         // const user = new User(userObj);
         // it returns a promises so we need to await
         await user.save();
-        res.send("User successfully created!");
+        res.status(201).send("User successfully created!");
     } catch(err) {
-        res.status(400).send("Error saving the user: ",err.message);
+        res.status(400).send("USER CREATION FAILED: " + err.message);
     }
 });
 
@@ -81,7 +80,7 @@ app.delete('/users/:id', async(req, res) => {
 
 app.patch('/users/:id', async(req, res) => {
     try{
-        const userId = await User.findByIdAndUpdate({_id: req.params.id}, req.body, {returnDocument:"before"});
+        const userId = await User.findByIdAndUpdate({_id: req.params.id}, req.body, {returnDocument:"before",runValidators:true});
         console.log("userId", userId);
         if(!userId) {
             res.status(404).send("User not found");
@@ -89,7 +88,7 @@ app.patch('/users/:id', async(req, res) => {
             res.send("User updated successfully");
         }
     }catch(err) {
-        res.status(400).send("Something went wrong");
+        res.status(400).send("UPDATE FAILED: " + err.message);
     }
 });
 connectDB().then(() => {
