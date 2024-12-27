@@ -5,31 +5,31 @@ const connectDB = require("./config/database")
 // create new express application, instance of express
 const app = express();
 const User = require("./models/user")
+const {validateSignUpData} = require("./utils/validation")
+const bcrypt = require("bcrypt");
 
 // now this middleware will be active for all the routes
 app.use(express.json());
 
 app.post('/signup', async(req, res) => {
-    // it will be undefined, reason is our server is not able to read the json data, to read the json data we need a middleware which can check the incoming request and parse the json data
-    // console.log("req", req.body)
-    // const userObj = {
-    //     firstName: "Neel",
-    //     lastName: "Punj",
-    //     emailId: "punjneel@gmail.com",
-    //     password: "Nilank@123"
-    // }
-   
     try{
-        if(!validator.isEmail(req.body.emailId)) {
-            throw new Error("Email is not valid");
-        }
-        if (req.body.skills?.length > 10){
-            throw new Error("Skills can not be more than 10");
-        }
-        const user = new User(req.body);
-        // creating new Instance of User model
-        // const user = new User(userObj);
-        // it returns a promises so we need to await
+        // validation of data
+        validateSignUpData(req);
+
+        const {firstName, lastName, emailId, password, gender, skills} = req.body;
+        
+        // encrypt the password
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        const user = new User({
+            firstName, 
+            lastName, 
+            emailId, 
+            password: passwordHash,
+            gender,
+            skills
+        });
+        
         await user.save();
         res.status(201).send("User successfully created!");
     } catch(err) {
