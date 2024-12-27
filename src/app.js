@@ -5,7 +5,7 @@ const connectDB = require("./config/database")
 // create new express application, instance of express
 const app = express();
 const User = require("./models/user")
-const {validateSignUpData} = require("./utils/validation")
+const {validateSignUpData, ValidateLoginData} = require("./utils/validation")
 const bcrypt = require("bcrypt");
 
 // now this middleware will be active for all the routes
@@ -34,6 +34,32 @@ app.post('/signup', async(req, res) => {
         res.status(201).send("User successfully created!");
     } catch(err) {
         res.status(400).send("USER CREATION FAILED: " + err.message);
+    }
+});
+
+app.post('/login', async(req, res) => {
+
+    try{
+        ValidateLoginData(req);
+        const {emailId, password} = req.body;
+        
+        const user = await User.findOne({emailId});
+        if(!user) {
+            throw new Error("Invalid Credentials");
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid){
+            throw new Error("Invalid Credentials");
+        }
+        else {
+            res.send("User successfully logged in");
+        }
+
+
+    }catch(err) {
+        res.status(400).send("ERROR IN LOGIN: " + err.message);
     }
 });
 
@@ -110,6 +136,7 @@ app.patch('/users/:id', async(req, res) => {
         res.status(400).send("UPDATE FAILED: " + err.message);
     }
 });
+
 connectDB().then(() => {
     console.log("Database connection eastablished....")
     app.listen(3000, ()=> {
