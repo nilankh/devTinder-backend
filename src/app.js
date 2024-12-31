@@ -8,6 +8,7 @@ const User = require("./models/user")
 const {validateSignUpData, ValidateLoginData} = require("./utils/validation")
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 // now this middleware will be active for all the routes
 app.use(express.json());
@@ -57,10 +58,12 @@ app.post('/login', async(req, res) => {
         }
         else {
             //  create a jwt token
+            const token = await jwt.sign({_id: user._id ,emailId: user.emailId}, "dskjfdffkdsjfkdsfncsxcnz")
 
+            console.log("token", token);
 
             // add the token to cookie and send the response back to the user
-            res.cookie("token", "sdfbsjdsxyz");
+            res.cookie("token", token);
             res.send("User successfully logged in");
         }
 
@@ -74,12 +77,25 @@ app.get('/profile', async(req, res) => {
 
     try{
         // get the token from the cookie
-        const token = req.cookies;
-        console.log("token", token);
+        const cookies = req.cookies;
+        const {token} = cookies;
+
         if(!token) {
             throw new Error("Unauthorized request");
         }
-        res.send("User profile data");
+
+        const decodedMessage = await jwt.verify(token, "dskjfdffkdsjfkdsfncsxcnz");
+
+        if(!decodedMessage) {
+            throw new Error("Unauthorized request");
+        }
+
+        const user = await User.findById(decodedMessage._id);
+        if(!user) {
+            throw new Error("User not found");
+        }
+
+        res.send(user);
     }catch(err) {
         res.status(401).send("ERROR IN PROFILE: " + err.message);
     }
