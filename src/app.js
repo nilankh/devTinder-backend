@@ -7,9 +7,11 @@ const app = express();
 const User = require("./models/user")
 const {validateSignUpData, ValidateLoginData} = require("./utils/validation")
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
 
 // now this middleware will be active for all the routes
 app.use(express.json());
+app.use(cookieParser())
 
 app.post('/signup', async(req, res) => {
     try{
@@ -54,12 +56,32 @@ app.post('/login', async(req, res) => {
             throw new Error("Invalid Credentials");
         }
         else {
+            //  create a jwt token
+
+
+            // add the token to cookie and send the response back to the user
+            res.cookie("token", "sdfbsjdsxyz");
             res.send("User successfully logged in");
         }
 
 
     }catch(err) {
         res.status(400).send("ERROR IN LOGIN: " + err.message);
+    }
+});
+
+app.get('/profile', async(req, res) => {
+
+    try{
+        // get the token from the cookie
+        const token = req.cookies;
+        console.log("token", token);
+        if(!token) {
+            throw new Error("Unauthorized request");
+        }
+        res.send("User profile data");
+    }catch(err) {
+        res.status(401).send("ERROR IN PROFILE: " + err.message);
     }
 });
 
