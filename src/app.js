@@ -9,6 +9,7 @@ const {validateSignUpData, ValidateLoginData} = require("./utils/validation")
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const {userAuth} = require("./middlewares/auth");
 
 // now this middleware will be active for all the routes
 app.use(express.json());
@@ -73,29 +74,10 @@ app.post('/login', async(req, res) => {
     }
 });
 
-app.get('/profile', async(req, res) => {
+app.get('/profile', userAuth,async(req, res) => {
 
     try{
-        // get the token from the cookie
-        const cookies = req.cookies;
-        const {token} = cookies;
-
-        if(!token) {
-            throw new Error("Unauthorized request");
-        }
-
-        const decodedMessage = await jwt.verify(token, "dskjfdffkdsjfkdsfncsxcnz");
-
-        if(!decodedMessage) {
-            throw new Error("Unauthorized request");
-        }
-
-        const user = await User.findById(decodedMessage._id);
-        if(!user) {
-            throw new Error("User not found");
-        }
-
-        res.send(user);
+        res.send(req.user);
     }catch(err) {
         res.status(401).send("ERROR IN PROFILE: " + err.message);
     }
