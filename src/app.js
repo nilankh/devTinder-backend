@@ -52,15 +52,14 @@ app.post('/login', async(req, res) => {
             throw new Error("Invalid Credentials");
         }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await user.validatePassword(password);
 
         if (!isPasswordValid){
             throw new Error("Invalid Credentials");
         }
         else {
             //  create a jwt token
-            const token = await jwt.sign({_id: user._id ,emailId: user.emailId}, "dskjfdffkdsjfkdsfncsxcnz")
-
+            const token = await user.getJWT();
             console.log("token", token);
 
             // add the token to cookie and send the response back to the user
@@ -156,6 +155,15 @@ app.patch('/users/:id', async(req, res) => {
         res.status(400).send("UPDATE FAILED: " + err.message);
     }
 });
+
+app.post("/sendConnectionRquest", userAuth,async(req, res) => {
+    // send a connection request to the user
+    console.log("send a connection request to the user");
+
+    res.send("Connection request sent successfully");
+});
+
+
 
 connectDB().then(() => {
     console.log("Database connection eastablished....")
