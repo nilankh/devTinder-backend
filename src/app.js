@@ -9,6 +9,7 @@ const {validateSignUpData, ValidateLoginData} = require("./utils/validation")
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const {userAuth} = require("./middlewares/auth");
 
 // now this middleware will be active for all the routes
 app.use(express.json());
@@ -51,15 +52,14 @@ app.post('/login', async(req, res) => {
             throw new Error("Invalid Credentials");
         }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await user.validatePassword(password);
 
         if (!isPasswordValid){
             throw new Error("Invalid Credentials");
         }
         else {
             //  create a jwt token
-            const token = await jwt.sign({_id: user._id ,emailId: user.emailId}, "dskjfdffkdsjfkdsfncsxcnz")
-
+            const token = await user.getJWT();
             console.log("token", token);
 
             // add the token to cookie and send the response back to the user
@@ -73,29 +73,10 @@ app.post('/login', async(req, res) => {
     }
 });
 
-app.get('/profile', async(req, res) => {
+app.get('/profile', userAuth,async(req, res) => {
 
     try{
-        // get the token from the cookie
-        const cookies = req.cookies;
-        const {token} = cookies;
-
-        if(!token) {
-            throw new Error("Unauthorized request");
-        }
-
-        const decodedMessage = await jwt.verify(token, "dskjfdffkdsjfkdsfncsxcnz");
-
-        if(!decodedMessage) {
-            throw new Error("Unauthorized request");
-        }
-
-        const user = await User.findById(decodedMessage._id);
-        if(!user) {
-            throw new Error("User not found");
-        }
-
-        res.send(user);
+        res.send(req.user);
     }catch(err) {
         res.status(401).send("ERROR IN PROFILE: " + err.message);
     }
@@ -174,6 +155,15 @@ app.patch('/users/:id', async(req, res) => {
         res.status(400).send("UPDATE FAILED: " + err.message);
     }
 });
+
+app.post("/sendConnectionRquest", userAuth,async(req, res) => {
+    // send a connection request to the user
+    console.log("send a connection request to the user");
+
+    res.send("Connection request sent successfully");
+});
+
+
 
 connectDB().then(() => {
     console.log("Database connection eastablished....")
