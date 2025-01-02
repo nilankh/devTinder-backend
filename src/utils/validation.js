@@ -31,4 +31,34 @@ const ValidateLoginData = (req) => {
         throw new Error("Please Enter a Password");
     }
 }
-module.exports = {validateSignUpData, ValidateLoginData};
+
+
+const validateProfileEditData = (req) => {
+
+    const {firstName, lastName, about, gender,photoUrl, skills, age} = req.body;
+
+    if(age && (age < 0 || age > 100)){
+        throw new Error("Invalid Age");
+    }
+
+    if(!firstName  || !validator.isAlpha(firstName) || firstName.length > 40 || firstName.length < 3){
+        throw new Error("First Name is not valid");
+    }
+
+    if(!lastName  || !validator.isAlpha(lastName) || lastName.length > 40 || lastName.length < 3){
+        throw new Error("Last Name is not valid");
+    }
+    
+    if (gender && !["male", "female", "others"].includes(gender.toLowerCase())){
+        throw new  Error("Please Select a valid gender");
+    }
+    const allowedEditFields = ["firstName", "lastName", "about", "gender","photoUrl", "skills", "age"];
+    
+    const isEditAllowed = Object.keys(req.body).every((field) => allowedEditFields.includes(field));
+
+
+
+    return isEditAllowed
+}
+
+module.exports = {validateSignUpData, ValidateLoginData, validateProfileEditData};
