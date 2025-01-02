@@ -28,7 +28,7 @@ authRouter.post('/login', async(req, res) => {
             console.log("token", token);
 
             // add the token to cookie and send the response back to the user
-            res.cookie("token", token);
+            res.cookie("token", token, {expires: new Date(Date.now() + 900000)});
             res.send("User successfully logged in");
         }
 
@@ -62,6 +62,18 @@ authRouter.post('/signup', async(req, res) => {
     } catch(err) {
         res.status(400).send("USER CREATION FAILED: " + err.message);
     }
+});
+
+authRouter.post('/logout', async(req, res) => {
+    // try{
+    //     res.clearCookie("token");
+    //     res.send("User successfully logged out");
+    // }catch(err) {
+    //     res.status(400).send("ERROR IN LOGOUT: " + err.message);
+    // }
+
+    res.cookie("token", null, {expires: new Date(Date.now())});
+    res.send("User successfully logged out");
 });
 
 module.exports = authRouter;
