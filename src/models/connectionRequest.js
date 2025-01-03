@@ -23,6 +23,16 @@ const connectionRequestSchema = new mongoose.Schema({
 }
 );
 
+// validation,this is a kind of middleware, it will be call everytime before save
+connectionRequestSchema.pre("save", function(next){
+    const connectionRequest = this;
+    // check if the fromUserId and toUserId are same
+    if(connectionRequest.fromUserId.equals(connectionRequest.toUserId)){
+        throw new Error("fromUserId and toUserId can not be same");
+    }
+    next();
+})
+
 const ConnectionRequestModel = new mongoose.model(
     "ConnectionRequest",
     connectionRequestSchema
