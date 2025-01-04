@@ -23,6 +23,10 @@ const connectionRequestSchema = new mongoose.Schema({
 }
 );
 
+// 1 means ascending order
+// optimising the query, and compound index, read more about it.
+connectionRequestSchema.index({fromUserId: 1, toUserId: 1})
+
 // validation,this is a kind of middleware, it will be call everytime before save
 connectionRequestSchema.pre("save", function(next){
     const connectionRequest = this;
