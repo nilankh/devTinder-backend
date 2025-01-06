@@ -13,12 +13,34 @@ userRouter.get("/user/connections/received", userAuth,async(req, res) => {
         const connectionRequest = await ConnectionRequest.find({
             toUserId: loggedInUser._id,
             status : "interested"
-        });
+        }).populate("fromUserId", "firstName lastName");
+        // }).populate("fromUserId", ["firstName","lastName"]); this is also possible, both is same
+
+
         res.json({"message":"Data fetched successfully!", "data":connectionRequest})
     }catch(err){
         res.status(400).send("Error: " + err.message);
     }
 })
 
+userRouter.get("/user/connections", userAuth, async(req, res) => {
+    try{
+        const loggedInUser = req.user;
+
+        const connectionRequest = await ConnectionRequest.find({
+            $or: [
+                {toUserId: loggedInUser._id,status : "accepted"},
+                {fromUserId: loggedInUser._id,status : "accepted"}
+            ],
+        }).populate("fromUserId", "firstName lastName");
+
+        const data = connectionRequest.map((row) => row.fromUserId);
+
+        res.json({"message":"Data fetched successfully!", "data":data})
+
+    }catch(err){
+        res.status(400).send("Error: " + err.message);
+    }
+})
 
 module.exports = userRouter;
