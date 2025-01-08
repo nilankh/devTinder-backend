@@ -49,4 +49,19 @@ userRouter.get("/user/connections", userAuth, async(req, res) => {
     }
 })
 
+
+userRouter.get("/feed", userAuth, async(req, res) => {
+    try{
+        // user can see all the users, exccept
+        // 1. his own card.
+        // 2. His connections.
+        // 3. Ignored people.
+        // 4. Already send the connection request.
+
+        res.json({"message":"Data fetched successfully!", "data":data})
+    }catch(err){
+        res.status(400).send("Error: " + err.message);
+    }
+})
+
 module.exports = userRouter;
