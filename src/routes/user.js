@@ -57,8 +57,25 @@ userRouter.get("/feed", userAuth, async(req, res) => {
         // 2. His connections.
         // 3. Ignored people.
         // 4. Already send the connection request.
+        
+        const loggedInUser = req.user;
 
-        res.json({"message":"Data fetched successfully!", "data":data})
+        // find all the connection request(sent + received)
+        const connectionRequest = await ConnectionRequest.find({
+            $or:[
+                {fromUserId: loggedInUser._id},
+                {toUserId: loggedInUser._id},
+            ]
+        }).select("fromUserId toUserId");
+
+        const hideUsersFromFeed = new Set();
+        connectionRequest.forEach(req => {
+            hideUsersFromFeed.add(req.fromUserId.toString());
+            hideUsersFromFeed.add(req.toUserId.toString())
+        })
+        console.log('line 76', hideUsersFromFeed)
+
+        res.json({"message":"Data fetched successfully!", "data":connectionRequest})
     }catch(err){
         res.status(400).send("Error: " + err.message);
     }
