@@ -4,6 +4,7 @@ const userRouter = express.Router();
 
 const {userAuth} = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest")
+const User = require("../models/user")
 
 // Get all the pending connection request for the loggedIn User
 userRouter.get("/user/connections/received", userAuth,async(req, res) => {
@@ -75,7 +76,16 @@ userRouter.get("/feed", userAuth, async(req, res) => {
         })
         console.log('line 76', hideUsersFromFeed)
 
-        res.json({"message":"Data fetched successfully!", "data":connectionRequest})
+        const users = await User.find({
+            $and:[
+                {_id: {$nin: Array.from(hideUsersFromFeed)},},
+                {_id: {$ne: loggedInUser._id}},
+            ],
+        }).select("firstName lastName photoUrl age gender about skills")
+
+        console.log('line 82', users)
+
+        res.json({"message":"Data fetched successfully!", "data":users})
     }catch(err){
         res.status(400).send("Error: " + err.message);
     }
