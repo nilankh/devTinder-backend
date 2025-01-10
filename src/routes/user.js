@@ -70,6 +70,11 @@ userRouter.get("/feed", userAuth, async(req, res) => {
         
         const loggedInUser = req.user;
 
+        const page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        limit = limit > 50 ? 50: limit;
+
         // find all the connection request(sent + received)
         const connectionRequest = await ConnectionRequest.find({
             $or:[
@@ -83,18 +88,16 @@ userRouter.get("/feed", userAuth, async(req, res) => {
             hideUsersFromFeed.add(req.fromUserId.toString());
             hideUsersFromFeed.add(req.toUserId.toString())
         })
-        console.log('line 76', hideUsersFromFeed)
 
         const users = await User.find({
             $and:[
                 {_id: {$nin: Array.from(hideUsersFromFeed)},},
                 {_id: {$ne: loggedInUser._id}},
             ],
-        }).select("firstName lastName photoUrl age gender about skills")
-
-        console.log('line 82', users)
+        }).select("firstName lastName photoUrl age gender about skills").skip(skip).limit(limit);
 
         res.json({"message":"Data fetched successfully!", "data":users})
+        
     }catch(err){
         res.status(400).send("Error: " + err.message);
     }
