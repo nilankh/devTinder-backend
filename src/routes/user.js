@@ -4,6 +4,7 @@ const userRouter = express.Router();
 
 const {userAuth} = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest")
+const User = require("../models/user")
 
 // Get all the pending connection request for the loggedIn User
 userRouter.get("/user/connections/received", userAuth,async(req, res) => {
@@ -51,6 +52,15 @@ userRouter.get("/user/connections", userAuth, async(req, res) => {
 
 
 userRouter.get("/feed", userAuth, async(req, res) => {
+
+    /*
+        MONGODB functions
+        .skip() -> how many do you skip from the starting
+        .limit() -> how many documents you want
+
+            if suppose .skip(0) and .limit(10) -> will give me first 10 users. 
+            for page 2 we need to skip first 10 users .skip(10) and .limit(10)
+    */
     try{
         // user can see all the users, exccept
         // 1. his own card.
@@ -75,7 +85,16 @@ userRouter.get("/feed", userAuth, async(req, res) => {
         })
         console.log('line 76', hideUsersFromFeed)
 
-        res.json({"message":"Data fetched successfully!", "data":connectionRequest})
+        const users = await User.find({
+            $and:[
+                {_id: {$nin: Array.from(hideUsersFromFeed)},},
+                {_id: {$ne: loggedInUser._id}},
+            ],
+        }).select("firstName lastName photoUrl age gender about skills")
+
+        console.log('line 82', users)
+
+        res.json({"message":"Data fetched successfully!", "data":users})
     }catch(err){
         res.status(400).send("Error: " + err.message);
     }
