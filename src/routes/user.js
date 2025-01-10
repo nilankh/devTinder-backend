@@ -52,6 +52,15 @@ userRouter.get("/user/connections", userAuth, async(req, res) => {
 
 
 userRouter.get("/feed", userAuth, async(req, res) => {
+
+    /*
+        MONGODB functions
+        .skip() -> how many do you skip from the starting
+        .limit() -> how many documents you want
+
+            if suppose .skip(0) and .limit(10) -> will give me first 10 users. 
+            for page 2 we need to skip first 10 users .skip(10) and .limit(10)
+    */
     try{
         // user can see all the users, exccept
         // 1. his own card.
