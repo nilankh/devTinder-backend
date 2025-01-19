@@ -1,9 +1,9 @@
-// mongodb+srv://nilanknikhilh:pYBxK5JP50aPdMoN@nodejsh.ynwav.mongodb.net/
 
 const mongoose = require('mongoose');
+require('dotenv').config();
 
 const connectDB = async() => {
-    await mongoose.connect("mongodb+srv://nilanknikhilh:pYBxK5JP50aPdMoN@nodejsh.ynwav.mongodb.net/devTinder")
+    await mongoose.connect(`mongodb+srv://${process.env.DATABASE_USER_NAME}:${process.env.DATABASE_USER_PW}@nodejsh.ynwav.mongodb.net/devTinder`)
 }
 
 module.exports = connectDB;
